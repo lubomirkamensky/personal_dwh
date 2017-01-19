@@ -1,0 +1,1 @@
+powershell -command "& 'C:\personaldwh\weather_load.ps1' "

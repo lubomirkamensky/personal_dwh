@@ -1,0 +1,15 @@
+CREATE TABLE weather_measuring (
+  `Datetime` datetime NOT NULL,
+  Total_Rain decimal(7,1) DEFAULT NULL,
+  Relative_Pressure decimal(7,1) DEFAULT NULL,
+  Indoor_Temp decimal(5,1) DEFAULT NULL,
+  Outdoor_Temp decimal(5,1) DEFAULT NULL,
+  Indoor_Hum tinyint(4) DEFAULT NULL,
+  Outdoor_Hum tinyint(4) DEFAULT NULL,
+  Dewpoint decimal(5,1) DEFAULT NULL,
+  Wind_Speed decimal(5,1) DEFAULT NULL,
+  Wind_Chill decimal(5,1) DEFAULT NULL,
+  Wind_Direction varchar(5) DEFAULT NULL,
+  Insert_Dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (Datetime)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

@@ -1,0 +1,1 @@
+powershell -command "& 'C:\personaldwh\weather_rupload.ps1' "
