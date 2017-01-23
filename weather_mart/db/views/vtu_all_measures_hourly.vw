@@ -1,0 +1,44 @@
+CREATE VIEW pdwh_mart_weather.vtu_all_measures_hourly AS
+SELECT
+  Hour_id,
+  Actual_Rain,
+  Relative_Pressure_MIN,
+  Relative_Pressure_MAX,
+  Relative_Pressure_AVG,
+  Outdoor_Temp_MIN,
+  Outdoor_Temp_MAX,
+  Outdoor_Temp_AVG,
+  Outdoor_Hum_MIN,
+  Outdoor_Hum_MAX,
+  Outdoor_Hum_AVG,
+  Dewpoint_MIN,
+  Dewpoint_MAX,
+  Dewpoint_AVG,
+  Wind_Speed_MIN,
+  Wind_Speed_MAX,
+  Wind_Speed_AVG,
+  Records_count
+FROM
+    pdwh_mart_weather.t_all_measures_hourly
+UNION ALL
+SELECT
+  Hour_id,
+  Actual_Rain,
+  Relative_Pressure_MIN,
+  Relative_Pressure_MAX,
+  Relative_Pressure_AVG,
+  Outdoor_Temp_MIN,
+  Outdoor_Temp_MAX,
+  Outdoor_Temp_AVG,
+  Outdoor_Hum_MIN,
+  Outdoor_Hum_MAX,
+  Outdoor_Hum_AVG,
+  Dewpoint_MIN,
+  Dewpoint_MAX,
+  Dewpoint_AVG,
+  Wind_Speed_MIN,
+  Wind_Speed_MAX,
+  Wind_Speed_AVG,
+  Records_count
+FROM
+    pdwh_mart_weather.t_adj_all_measures_hourly;

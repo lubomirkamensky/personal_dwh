@@ -1,0 +1,5 @@
+CREATE TABLE pdwh_detail.`year` (
+  Year_Id int(11) NOT NULL,
+  Prior_Year_Id int(11) DEFAULT NULL,
+  PRIMARY KEY (Year_Id)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

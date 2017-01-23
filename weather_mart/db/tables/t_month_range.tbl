@@ -1,0 +1,4 @@
+CREATE TABLE pdwh_mart_weather.t_month_range (
+  Month_id int(0) NOT NULL DEFAULT '0',
+  PRIMARY KEY  Month_id (Month_id)
+ ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

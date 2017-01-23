@@ -1,0 +1,10 @@
+CREATE TABLE pdwh_detail.`day` (
+  Day_Id int(11) NOT NULL,
+  Prior_Day_Id int(11) DEFAULT NULL,
+  Day_In_Week tinyint(4) DEFAULT NULL,
+  Day_In_Month tinyint(4) DEFAULT NULL,
+  Day_In_Year smallint(6) DEFAULT NULL,
+  Month_Id int(11) DEFAULT NULL,
+  Week_Id int(11) DEFAULT NULL,
+  PRIMARY KEY (Day_Id)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

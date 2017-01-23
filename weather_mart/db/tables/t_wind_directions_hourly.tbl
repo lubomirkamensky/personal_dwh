@@ -1,0 +1,9 @@
+CREATE TABLE pdwh_mart_weather.t_wind_directions_hourly (
+  Hour_id int(0) NOT NULL DEFAULT '0',
+  Wind_Direction varchar(5) DEFAULT NULL,
+  Wind_Speed_MIN decimal(5,1) DEFAULT NULL,
+  Wind_Speed_MAX decimal(5,1) DEFAULT NULL,
+  Wind_Speed_AVG decimal(9,5) DEFAULT NULL,
+  Records_count int(0) NOT NULL DEFAULT '0',
+  PRIMARY KEY  Hour_id_dir (Hour_id,Wind_Direction)
+ ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

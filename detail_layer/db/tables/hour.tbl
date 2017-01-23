@@ -1,0 +1,9 @@
+CREATE TABLE pdwh_detail.hour (
+  Hour_Id int(11) NOT NULL,
+  Prior_Hour_Id int(11) DEFAULT NULL,
+  Hour_In_Day tinyint(4) DEFAULT NULL,
+  Day_Id int(11) DEFAULT NULL,
+  Hour_Start_Dt datetime DEFAULT NULL,
+  Hour_End_Dt datetime DEFAULT NULL,
+  PRIMARY KEY (Hour_Id)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

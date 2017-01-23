@@ -1,0 +1,7 @@
+CREATE TABLE pdwh_detail.`month` (
+  Month_Id int(11) NOT NULL,
+  Prior_Month_Id int(11) DEFAULT NULL,
+  Month_In_Year tinyint(4) DEFAULT NULL,
+  Year_Id int(11) DEFAULT NULL,
+  PRIMARY KEY (Month_Id)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

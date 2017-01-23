@@ -1,4 +1,4 @@
-CREATE TABLE weather_measuring (
+CREATE TABLE pdwh_detail.weather_measuring (
   `Datetime` datetime NOT NULL,
   Total_Rain decimal(7,1) DEFAULT NULL,
   Relative_Pressure decimal(7,1) DEFAULT NULL,

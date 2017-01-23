@@ -1,0 +1,4 @@
+CREATE TABLE pdwh_mart_weather.t_process_day (
+  Day_id int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (Day_id)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
