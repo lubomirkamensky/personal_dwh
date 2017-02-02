@@ -19,7 +19,7 @@ SELECT
   Wind_Speed_AVG,
   Records_count
 FROM
-    pdwh_mart_weather.t_all_measures_monthly
+    pdwh_mart_weather.v_all_measures_monthly
 UNION ALL
 SELECT
   Month_id,
@@ -44,7 +44,7 @@ FROM
     pdwh_mart_weather.t_adj_all_measures_monthly
 UNION ALL
 SELECT
-  CAST(LEFT(Day_id, 6) AS INT) AS Month_id,
+  LEFT(Day_id, 6) AS Month_id,
   SUM(Actual_Rain),
   SUM(Relative_Pressure_MIN),
   SUM(Relative_Pressure_MAX),
@@ -67,7 +67,7 @@ FROM
 GROUP BY 1
 UNION ALL
 SELECT
-  CAST(LEFT(hour_id, 6) AS INT) AS Month_id,
+  LEFT(hour_id, 6) AS Month_id,
   SUM(Actual_Rain),
   SUM(Relative_Pressure_MIN),
   SUM(Relative_Pressure_MAX),

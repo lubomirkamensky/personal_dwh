@@ -1,9 +1,0 @@
-CREATE TABLE pdwh_mart_weather.t_wm_calendar (
-  Hour_id int(0) NOT NULL DEFAULT '0',
-  Day_id int(0) NOT NULL DEFAULT '0',
-  Month_id int(0) NOT NULL DEFAULT '0',
-  PRIMARY KEY  Hour_id (Hour_id)
- ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
- ALTER TABLE  pdwh_mart_weather.t_wm_calendar ADD INDEX  Day_Id (  Day_id );
- ALTER TABLE  pdwh_mart_weather.t_wm_calendar ADD INDEX  Month_Id (  Month_id );
- 

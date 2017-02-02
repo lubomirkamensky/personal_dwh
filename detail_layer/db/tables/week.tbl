@@ -4,4 +4,4 @@ CREATE TABLE pdwh_detail.`week` (
   Week_In_Year tinyint(4) DEFAULT NULL,
   Year_Id int(11) DEFAULT NULL,
   PRIMARY KEY (Week_Id)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

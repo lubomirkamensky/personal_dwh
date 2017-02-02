@@ -19,7 +19,7 @@ SELECT
   Wind_Speed_AVG,
   Records_count
 FROM
-    pdwh_mart_weather.t_all_measures_hourly
+    pdwh_mart_weather.v_all_measures_hourly
 UNION ALL
 SELECT
   Hour_id,

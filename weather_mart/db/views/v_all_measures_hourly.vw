@@ -20,7 +20,4 @@ SELECT
     ,Count(*) AS Records_count
 FROM
     pdwh_detail.weather_measuring wm
-INNER JOIN
-    pdwh_mart_weather.t_process_hour lm
-    ON DATE_FORMAT(wm.`Datetime`, '%Y%m%d%H') = lm.Hour_Id
 GROUP BY 1;

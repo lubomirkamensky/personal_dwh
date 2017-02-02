@@ -8,7 +8,4 @@ SELECT
     ,Count(*) AS Records_count
 FROM
     pdwh_detail.weather_measuring wm
-INNER JOIN
-    pdwh_mart_weather.t_process_month lm
-    ON DATE_FORMAT(wm.`Datetime`, '%Y%m') = lm.Month_Id
 GROUP BY 1,2;
