@@ -1,4 +1,4 @@
-CREATE VIEW pdwh_detail.weather_measuring_curr_load AS
+CREATE OR REPLACE VIEW pdwh_detail.weather_measuring_curr_load AS
 SELECT 
     WMC.*
 FROM

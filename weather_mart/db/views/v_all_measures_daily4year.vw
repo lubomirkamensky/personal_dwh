@@ -1,6 +1,6 @@
-CREATE VIEW pdwh_mart_weather.vt_all_measures_yearly AS
+CREATE OR REPLACE VIEW pdwh_mart_weather.v_all_measures_daily4year AS
 SELECT
-  LEFT(Month_id, 4) AS Year_Id,
+  LEFT(Hour_id,8) AS Day_Id,
   SUM(Actual_Rain) AS Actual_Rain,
   MIN(Relative_Pressure_MIN) AS Relative_Pressure_MIN,
   MAX(Relative_Pressure_MAX) AS Relative_Pressure_MAX,
@@ -18,6 +18,6 @@ SELECT
   MAX(Wind_Speed_MAX) AS Wind_Speed_MAX,
   AVG(Wind_Speed_AVG) AS Wind_Speed_AVG,
   SUM(Records_count) AS Records_count
-FROM pdwh_mart_weather.vt_all_measures_monthly
-GROUP BY 1
-;
+FROM
+    pdwh_mart_weather.vs_all_measures_hourly4year wm
+GROUP BY 1;

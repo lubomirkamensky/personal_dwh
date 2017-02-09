@@ -1,4 +1,4 @@
-CREATE VIEW pdwh_detail.v_hour_detail AS
+CREATE OR REPLACE VIEW pdwh_detail.v_hour_detail AS
 SELECT
     h.hour_id
     ,h.prior_hour_id

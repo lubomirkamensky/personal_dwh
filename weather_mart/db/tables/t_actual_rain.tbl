@@ -1,0 +1,5 @@
+CREATE TABLE pdwh_mart_weather.t_actual_rain (
+  `Datetime` datetime NOT NULL,
+  Actual_Rain decimal(7,1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (Datetime)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

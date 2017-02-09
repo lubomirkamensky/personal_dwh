@@ -7,4 +7,4 @@ CREATE TABLE pdwh_detail.`day` (
   Month_Id int(11) DEFAULT NULL,
   Week_Id int(11) DEFAULT NULL,
   PRIMARY KEY (Day_Id)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

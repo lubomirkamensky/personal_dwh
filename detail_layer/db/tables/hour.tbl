@@ -6,4 +6,4 @@ CREATE TABLE pdwh_detail.hour (
   Hour_Start_Dt datetime DEFAULT NULL,
   Hour_End_Dt datetime DEFAULT NULL,
   PRIMARY KEY (Hour_Id)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

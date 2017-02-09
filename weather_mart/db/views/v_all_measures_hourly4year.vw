@@ -1,7 +1,7 @@
-CREATE VIEW pdwh_mart_weather.v_all_measures_monthly AS
+CREATE OR REPLACE VIEW pdwh_mart_weather.v_all_measures_hourly4year AS
 SELECT
-    DATE_FORMAT(wm.`Datetime`, '%Y%m') AS Month_id
-    ,MAX(wm.Total_Rain) - MIN(wm.Total_Rain) AS Actual_Rain
+    DATE_FORMAT(wm.`Datetime`, '%Y%m%d%H') AS Hour_id
+    ,SUM(ar.Actual_Rain) AS Actual_Rain
     ,MIN(wm.Relative_Pressure) AS Relative_Pressure_MIN
     ,MAX(wm.Relative_Pressure) AS Relative_Pressure_MAX
     ,AVG(wm.Relative_Pressure) AS Relative_Pressure_AVG
@@ -20,4 +20,11 @@ SELECT
     ,Count(*) AS Records_count
 FROM
     pdwh_detail.weather_measuring wm
+INNER JOIN
+    pdwh_mart_weather.t_loaded_periods tm
+    ON DATE_FORMAT(wm.`Datetime`, '%Y') >= LEFT(tm.Day_Id,4)
+INNER JOIN
+    pdwh_mart_weather.t_actual_rain ar
+    ON wm.`Datetime` = ar.`Datetime`
+      AND DATE_FORMAT(ar.`Datetime`, '%Y') >= LEFT(tm.Day_Id,4)
 GROUP BY 1;

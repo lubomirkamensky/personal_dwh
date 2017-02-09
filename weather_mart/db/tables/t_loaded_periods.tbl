@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS pdwh_mart_weather.t_loaded_periods;
+CREATE TABLE pdwh_mart_weather.t_loaded_periods (
+  Day_Id bigint(11) NOT NULL DEFAULT 20110730
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO pdwh_mart_weather.t_loaded_periods VALUES(20110730);

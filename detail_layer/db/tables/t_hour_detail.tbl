@@ -25,4 +25,4 @@ CREATE TABLE pdwh_detail.t_hour_detail (
   partial_lunar_e_dt datetime DEFAULT NULL,
   penumbral_lunar_e_dt datetime DEFAULT NULL,
   PRIMARY KEY  hour_id (hour_id)
- ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
