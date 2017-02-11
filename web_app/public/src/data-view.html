@@ -205,6 +205,7 @@
       ],
 
       grainChanged: function () {
+        console.log("grainChanged to: " + this.grain);
         if (this.grain == "Hourly") {
           this.$.periodstart.label = 'Start YYYY-MM-DD HH';
           var endtime = getTimeNow()
@@ -248,7 +249,7 @@
       dataChanged: function () {
         console.log(this.pcount);
         //console.log(this.$.query1.data);
-        //console.log(Date.now());
+        if (typeof(this.pcount) != "undefined") {
         if (this.measure == "Rain") {
           header = [["Date", "Rain"]];
         } else {
@@ -256,7 +257,8 @@
         }
         if(this.$.query1.data.length>this.pcount-2) {
           this.$.chart1.data = header.concat(this.$.query1.data);
-        }
+          console.log("dataChanged");
+        }}
  
       },
       startEndChanged: function () {
@@ -364,10 +366,10 @@
 });
 
 function getCount(start, end, x) {
-  var count = Math.abs(Math.round((end.getTime()-start.getTime())/(1000*60*60*x)));
+  var count = Math.round((end.getTime()-start.getTime())/(1000*60*60*x));
   if (count>1) {
     return count;
-  }
+  } 
 }
 function getTimeNow() {
   return new Date().getTime() - (new Date().getTimezoneOffset() / 60) * 3600 * 1000;

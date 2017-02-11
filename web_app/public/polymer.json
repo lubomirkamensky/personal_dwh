@@ -3,7 +3,6 @@
   "shell": "src/data-lab.html",
   "fragments": [
     "src/data-view.html",
-    "src/my-view2.html",
     "src/my-view404.html"
   ],
   "sourceGlobs": [
