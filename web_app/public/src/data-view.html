@@ -1,0 +1,404 @@
+<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../bower_components/google-chart/google-chart.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="my-icons.html">
+<link rel="import" href="shared-styles.html">
+<dom-module id="data-view">
+<style include="iron-flex"></style>
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+      google-chart {
+      height: 280px;
+      width: 100%;
+    }
+    .card {
+        margin: 0;  
+        padding: 10px;  
+        border: 0;  
+        outline: 0;  
+    }
+
+
+
+    .container {
+      @apply(--layout-horizontal);
+      padding: 0 10px;
+    }
+    .container0 {
+      @apply(--layout-horizontal);
+      padding: 0 0px;
+    }
+    .container5 {
+      @apply(--layout-horizontal);
+      padding: 0 5px;
+    }
+    .flexchild {
+      @apply(--layout-flex);
+    }
+
+  paper-fab.blue {
+    --paper-fab-background: var(--paper-blue-500);
+    --paper-fab-keyboard-focus-background: var(--paper-blue-900);
+  }
+  paper-fab.yellow {
+    --paper-fab-background: var(--paper-amber-500);
+    --paper-fab-keyboard-focus-background: var(--paper-amber-900);
+  }
+  paper-fab.orange {
+    --paper-fab-background: var(--paper-orange-500);
+    --paper-fab-keyboard-focus-background: var(--paper-orange-900);
+  }
+  paper-fab.red {
+    --paper-fab-background: var(--paper-red-500);
+    --paper-fab-keyboard-focus-background: var(--paper-red-900);
+  }
+  paper-fab.lightblue {
+    --paper-fab-background: var(--paper-light-blue-500);
+    --paper-fab-keyboard-focus-background: var(--paper-light-blue-900);
+  }
+  paper-fab.indigo {
+    --paper-fab-background: var(--paper-indigo-500);
+    --paper-fab-keyboard-focus-background: var(--paper-indigo-900);
+  }
+  paper-button {
+    height: 5px;
+    width: 3px;
+    min-width: 0px;
+    padding: 0px 0;
+    margin: 0em;
+  }
+
+    </style>
+    <div class="card" id="card1">   
+    <div class="layout horizontal">
+    <div class="container"></div>
+    <div  class="container"><paper-dropdown-menu label="Subject Area" id="context-top">
+          <paper-listbox class="dropdown-content" selected="{{area}}" attr-for-selected="data-value">
+            <paper-item data-value="Weather">Weather</paper-item>
+            <paper-item data-value="House">House</paper-item>
+            <paper-item data-value="Garden">Garden</paper-item>
+            <paper-item data-value="Personal">Personal</paper-item>
+          </paper-listbox>
+    </paper-dropdown-menu></div>
+    <div  class="container"><paper-dropdown-menu label="Measure" id="measure-top">
+          <paper-listbox class="dropdown-content" selected="{{measure}}" attr-for-selected="data-value">
+            <paper-item data-value="Temperature">Temperature</paper-item>
+            <paper-item data-value="Rain">Rain</paper-item>
+            <paper-item data-value="Wind Speed">Wind Speed</paper-item>
+            <paper-item data-value="Pressure">Pressure</paper-item>
+            <paper-item data-value="Dewpoint">Dewpoint</paper-item>
+            <paper-item data-value="Humidity">Humidity</paper-item>
+          </paper-listbox>
+    </paper-dropdown-menu></div>
+    <div  class="container"><paper-dropdown-menu label="Grain" id="grain-top">
+          <paper-listbox class="dropdown-content" selected="{{grain}}" attr-for-selected="data-value" id="datagrain">
+            <paper-item data-value="Hourly">Hourly</paper-item>
+            <paper-item data-value="Daily">Daily</paper-item>
+            <paper-item data-value="Monthly">Monthly</paper-item>
+            <paper-item data-value="Yearly">Yearly</paper-item>
+          </paper-listbox>
+    </paper-dropdown-menu></div>
+    <div class="container"><paper-input id="periodstart" label="Start YYYY-MM-DD" value="{{pstart}}"></paper-input></div>
+    <div class="container"><paper-input id="periodend" label="End YYYY-MM-DD" value="{{pend}}"></paper-input></div>
+
+    <div  class="flexchild" align="right"></div>
+    <div  class="container"><paper-fab icon="my-icons:minus1Y" title="minus one year" class="red" on-tap="minus1Y"></paper-fab></div>
+    <div  class="container"><paper-fab icon="my-icons:minus1M" title="minus one month" class="orange" on-tap="minus1M"></paper-fab></div>
+    <div  class="container"><paper-fab icon="my-icons:minus1W" title="minus one week" class="yellow" on-tap="minus1W"></paper-fab></div>
+    <div  class="container"><paper-fab icon="my-icons:prior" title="go to prior" class="indigo" on-tap="prior"></paper-fab></div>
+    <div  class="container"><paper-fab icon="my-icons:next" title="go to next" class="lightblue" on-tap="next"></paper-fab></div>
+    <div class="container5"></div>
+    <div class="container0">
+      <template is="dom-if" if="{{isNotBase}}">
+        <paper-button on-tap="dropCard">x</paper-button>
+      </template>
+    </div>
+    
+    </div>
+
+    <firebase-query
+        id="query1"
+        app-name="[[project]]"
+        path="/Measures/[[area]]/[[measure]]/[[grain]]"
+        data="{{data}}"
+        order-by-child="0"
+        start-at="{{pstart}}"
+        end-at="{{pend}}">
+    </firebase-query>
+   <google-chart
+    id="chart1"
+    type='combo'
+    options='{"chartArea": {"left": "50","top": "30", "width": "90%", "height": "75%"}, "legend": {"position": "right", "textStyle":{"fontSize":"12"}},  "vAxis": {"textStyle": {"fontSize": "12"}},  "hAxis": {"textStyle": {"fontSize": "10"}}, "tooltip":{"textStyle":{"fontSize":"14"}}, "seriesType": "bars", "series": {"2": {"type": "line"}}}'
+    data=''>
+  </google-chart>
+ </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'data-view',
+      properties: {
+        project: String,
+        signedin: {
+          type: Boolean,
+          notify: true
+        },
+        pstart:  {
+          type: String,
+          notify: true
+        },
+        pend: {
+          type: String,
+          notify: true
+        },
+        pcount: Number,
+        hcount: {
+          type: Number,
+          value: 24
+        },
+        dcount: {
+          type: Number,
+          value: 30
+        },
+        mcount: {
+          type: Number,
+          value: Math.abs(Math.round((new Date('2011-07-01').getTime()-new Date().getTime())/(1000 * 60 * 60 * 24 * 30)))
+        },
+        ycount: {
+          type: Number,
+          value: new Date().getFullYear()-2011
+        },
+        area: {
+          type: String,
+          value: 'Weather'
+        },
+        measure: {
+          type: String,
+          value: 'Temperature',
+          notify: true
+        },
+        grain: {
+          type: String,
+          value: 'Hourly'
+        },
+        data: {
+          notify: true,
+          type: Object
+        },
+        isNotBase: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+      },
+      observers: [
+        'dataChanged(data.*)',
+        'grainChanged(grain)',
+        'startEndChanged(pend,pstart)'
+        ,'dataReload(signedin)'
+      ],
+
+      grainChanged: function () {
+        if (this.grain == "Hourly") {
+          this.$.periodstart.label = 'Start YYYY-MM-DD HH';
+          var endtime = getTimeNow()
+          this.$.periodstart.value = getHour(new Date(getOtherTime(endtime, -1*this.hcount, 1)));
+          this.$.periodend.label = 'End YYYY-MM-DD HH';
+          this.$.periodend.value = getHour(new Date(endtime));
+        }
+        if (this.grain == "Daily") {
+          this.$.periodstart.label = 'Start YYYY-MM-DD';
+          var endtime = getTimeNow()
+          this.$.periodstart.value = getDay(new Date(getOtherTime(endtime, -1*this.dcount, 24)));
+          this.$.periodend.label = 'End YYYY-MM-DD';
+          this.$.periodend.value = getDay(new Date(endtime));
+        }
+        if (this.grain == "Monthly") {
+          this.$.periodstart.label = 'Start YYYY-MM';
+          this.$.periodstart.value = '2011-07'
+          this.$.periodend.label = 'End YYYY-MM';
+          this.$.periodend.value = getMonth(new Date());
+        }
+        if (this.grain == "Yearly") {
+          this.$.periodstart.label = 'Start YYYY';
+          this.$.periodstart.value = '2011'
+          this.$.periodend.label = 'End YYYY';
+          this.$.periodend.value = getYear(new Date());
+        }
+      },  
+
+      dropCard: function () {
+        var parent = this.parentNode
+        Polymer.dom(parent).removeChild(this)
+        Polymer.dom.flush();
+      },
+
+      dataReload: function () {
+        if (this.signedin) {
+          this.$.datagrain.selected = 'Daily'
+        }
+      },
+
+      dataChanged: function () {
+        console.log(this.pcount);
+        //console.log(this.$.query1.data);
+        //console.log(Date.now());
+        if (this.measure == "Rain") {
+          header = [["Date", "Rain"]];
+        } else {
+          header = [["Date", "Min", "Max", "Avg"]];
+        }
+        if(this.$.query1.data.length>this.pcount-2) {
+          this.$.chart1.data = header.concat(this.$.query1.data);
+        }
+ 
+      },
+      startEndChanged: function () {
+        if (this.grain == "Hourly") {
+          var start = getDateFromHour(this.$.periodstart.value); 
+          var end = getDateFromHour(this.$.periodend.value);
+          this.pcount = getCount(start, end, 1);
+        } 
+        if (this.grain == "Daily") {
+          var start = getDateFromDay(this.$.periodstart.value); 
+          var end = getDateFromDay(this.$.periodend.value);
+          this.pcount = getCount(start, end, 24);
+        } 
+        if (this.grain == "Monthly") {
+          var start = getDateFromMonth(this.$.periodstart.value); 
+          var end = getDateFromMonth(this.$.periodend.value);
+          this.pcount = getCount(start, end, 24*30);
+        } 
+        if (this.grain == "Yearly") {
+          var start = getDateFromYear(this.$.periodstart.value); 
+          var end = getDateFromYear(this.$.periodend.value);
+          this.pcount = getCount(start, end, 24*30*12);
+        } 
+      },
+      prior: function () {
+        var count = this.pcount
+        this.$.periodend.value = this.$.periodstart.value
+        if (this.grain == "Hourly") {
+          var end = getDateFromHour(this.$.periodend.value).getTime();
+          this.$.periodstart.value = getHour(new Date(getOtherTime(end, -1*count, 1)));
+        } 
+        if (this.grain == "Daily") {
+          var end = getDateFromDay(this.$.periodend.value).getTime();
+          this.$.periodstart.value = getDay(new Date(getOtherTime(end, -1*count, 24)));
+        } 
+        if (this.grain == "Monthly") {
+          var end = getDateFromMonth(this.$.periodend.value).getTime();
+          this.$.periodstart.value = getMonth(new Date(getOtherTime(end, -1*count, 24*30)));
+        } 
+        if (this.grain == "Yearly") {
+          var end = getDateFromYear(this.$.periodend.value).getTime();
+          this.$.periodstart.value = getYear(new Date(getOtherTime(end, -1*count, 24*30*12)));
+        } 
+      },
+      next: function () {
+        var count = this.pcount;
+        this.$.periodstart.value = this.$.periodend.value
+        if (this.grain == "Hourly") {
+          var end = getDateFromHour(this.$.periodend.value).getTime();
+          this.$.periodend.value = getHour(new Date(getOtherTime(end, count, 1)));
+        } 
+        if (this.grain == "Daily") {
+          var end = getDateFromDay(this.$.periodend.value).getTime();
+          this.$.periodend.value = getDay(new Date(getOtherTime(end, count, 24)));
+        } 
+        if (this.grain == "Monthly") {
+          var end = getDateFromMonth(this.$.periodend.value).getTime();
+          this.$.periodend.value = getMonth(new Date(getOtherTime(end, count, 24*30)));
+        } 
+        if (this.grain == "Yearly") {
+          var end = getDateFromYear(this.$.periodend.value).getTime();
+          this.$.periodend.value = getYear(new Date(getOtherTime(end, count, 24*30*12)));
+        } 
+      },
+      minus1W: function () {
+        var count = this.pcount;
+        if (this.grain == "Hourly") {
+          var end = getDateFromHour(this.$.periodend.value).getTime();
+          this.$.periodend.value = getHour(new Date(getOtherTime(end, -1*7*24, 1)));
+          this.$.periodstart.value = getHour(new Date(getOtherTime(end, -1*7*24-count, 1)));
+        } 
+        if (this.grain == "Daily") {
+          var end = getDateFromDay(this.$.periodend.value).getTime();
+          this.$.periodend.value = getDay(new Date(getOtherTime(end, -1*7, 24)));
+          this.$.periodstart.value = getDay(new Date(getOtherTime(end, -1*7-count, 24)));
+        } 
+      },
+      minus1M: function () {
+        var count = this.pcount;
+        if (this.grain == "Hourly") {
+          var end = getDateFromHour(this.$.periodend.value).getTime();
+          this.$.periodend.value = getHour(new Date(getOtherTime(end, -1*30*24, 1)));
+          this.$.periodstart.value = getHour(new Date(getOtherTime(end, -1*30*24-count, 1)));
+        } 
+        if (this.grain == "Daily") {
+          var end = getDateFromDay(this.$.periodend.value).getTime();
+          this.$.periodend.value = getDay(new Date(getOtherTime(end, -1*30, 24)));
+          this.$.periodstart.value = getDay(new Date(getOtherTime(end, -1*30-count, 24)));
+        } 
+      },
+      minus1Y: function () {
+        var count = this.pcount;
+        if (this.grain == "Hourly") {
+          var end = getDateFromHour(this.$.periodend.value).getTime();
+          this.$.periodend.value = getHour(new Date(getOtherTime(end, -1*366*24, 1)));
+          this.$.periodstart.value = getHour(new Date(getOtherTime(end, -1*366*24-count, 1)));
+        } 
+        if (this.grain == "Daily") {
+          var end = getDateFromDay(this.$.periodend.value).getTime();
+          this.$.periodend.value = getDay(new Date(getOtherTime(end, -1*366, 24)));
+          this.$.periodstart.value = getDay(new Date(getOtherTime(end, -1*366-count, 24)));
+        } 
+      },
+
+});
+
+function getCount(start, end, x) {
+  var count = Math.abs(Math.round((end.getTime()-start.getTime())/(1000*60*60*x)));
+  if (count>1) {
+    return count;
+  }
+}
+function getTimeNow() {
+  return new Date().getTime() - (new Date().getTimezoneOffset() / 60) * 3600 * 1000;
+}
+function getOtherTime(one, count, x) {
+  return one + count * x * 3600 * 1000;
+}
+function getHour(date) {
+  return date.toISOString().substring(0, 13).replace('T',' ');
+}
+function getDay(date) {
+  return date.toISOString().substring(0, 10);
+}
+function getMonth(date) {
+  return date.toISOString().substring(0, 7);
+}
+function getYear(date) {
+  return date.toISOString().substring(0, 4);
+}
+function getDateFromHour(hourStr) {
+  return new Date(hourStr.substring(0,13).replace(" ","T")+":00:00");
+}
+function getDateFromDay(dayStr) {
+  return new Date(dayStr.substring(0,10)+"T00:00:00");
+}
+function getDateFromMonth(monthStr) {
+  return new Date(monthStr.substring(0,7)+"-01T00:00:00");
+}
+function getDateFromYear(yearStr) {
+  return new Date(yearStr.substring(0,4)+"-01-01T00:00:00");
+}
+
+  </script>
+</dom-module>

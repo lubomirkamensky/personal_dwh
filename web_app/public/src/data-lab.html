@@ -1,0 +1,262 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../bower_components/iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../bower_components/app-storage/app-network-status-behavior.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="my-icons.html">
+
+<dom-module id="data-lab">
+<style include="iron-flex"></style>
+  <template>
+    <style>
+      :host {
+        --app-primary-color: #4285f4;
+        --app-secondary-color: black;
+
+        display: block;
+      }
+
+
+      app-header {
+        color: #fff;
+        background-color: var(--app-primary-color);
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+
+
+      .link {
+        @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+        text-decoration: none;
+        color: white;
+        margin: 0 10px;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+
+        padding: 0 0px;
+
+        text-decoration: none;
+
+        color: var(--app-secondary-color);
+
+        line-height: 40px;
+      }
+
+      .drawer-list a.iron-selected {
+        color: black;
+
+        font-weight: bold;
+      }
+
+    .container {
+      @apply(--layout-horizontal);
+      padding: 0 10px;
+    }
+    .flexchild {
+      @apply(--layout-flex);
+    }
+
+  paper-fab.green {
+    --paper-fab-background: var(--paper-green-500);
+    --paper-fab-keyboard-focus-background: var(--paper-green-900);
+  }
+
+    data-view {
+        margin-top: 5px;  
+        margin-left: 5px;
+        margin-right: 5px;
+        margin-bottom: 0px;
+        padding: 10px;  
+        border: 0;  
+        outline: 0;  
+    }
+
+
+    app-toolbar {
+      height: 50px;
+    }
+    </style>
+
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+    <firebase-app name="[[project]]" api-key="[[apikey]]"
+        database-url="https://[[database]].firebaseio.com"
+        auth-domain="[[database]].firebaseapp.com">
+    </firebase-app>
+    <firebase-auth
+        id="auth"
+        app-name="[[project]]"
+        provider="google"
+        signed-in="{{signedIn}}"
+        user="{{user}}">
+    </firebase-auth>
+
+
+    <app-drawer-layout fullbleed>
+      <!-- Drawer content -->
+
+
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+
+        <app-header condenses reveals effects="waterfall">
+          <app-toolbar>
+
+
+            <div hidden$="[[!online]]"><iron-icon icon="cloud"></iron-icon></div>
+            <div hidden$="[[online]]"><iron-icon icon="cloud-off"></iron-icon></div>
+            <paper-icon-button
+               icon="[[computeLockIcon(signedIn)]]"
+               disabled="[[!signedIn]]"
+               on-tap="signOut">
+            </paper-icon-button>
+            <paper-button on-tap="signIn" hidden$="[[signedIn]]">
+                <iron-icon icon="account-circle"></iron-icon>
+                <span>Sign in</span>
+            </paper-button>
+
+            <div main-title>[[title]]</div>
+            <paper-tabs sticky>
+              <paper-tab link><a href="http://lubolab.com" class="link" tabindex="-1">Blog</a></paper-tab>
+            </paper-tabs>
+
+          </app-toolbar>
+        </app-header>
+
+        <iron-pages id ="pages1"
+            selected="[[page]]"
+            attr-for-selected="name"
+            fallback-selection="page-404"
+            role="main">
+          <data-view name="data-view" project="[[project]]" id="basedata" signedin="{{signedIn}}"></data-view>
+          <page-404 name="page-404"></page-404>
+        </iron-pages>
+  <div id="maincontent"></div>
+  <div class="layout horizontal">
+  <div  class="flexchild" align="right"></div>
+  <div class="container"><paper-fab icon="my-icons:add" title="open another card" class="green" on-tap="addCard"></div>
+  <div class="container"></div><div class="container"></div><div class="container"></div>
+  </div>
+      </app-header-layout>
+    </app-drawer-layout>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'data-lab',
+      
+      behaviors: [
+        Polymer.AppNetworkStatusBehavior
+      ],
+      
+      properties: {
+        title: String,
+        apikey: String,
+        database: String,
+        project: String,
+        periodStart: String,
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged'
+        },
+
+        signedIn: {
+          type: Boolean,
+          notify: true,
+          value: false
+        }
+      },
+
+      signIn: function() {
+          this.$.auth.signInWithPopup();
+      },
+
+      signOut: function() {
+        if (this.$.auth) {
+          this.$.auth.signOut();
+        }
+      },
+
+      computeLockIcon: function(signedIn) {
+        return signedIn ? 'lock-open' : 'lock';
+      },
+
+
+      observers: [
+        '_routePageChanged(routeData.page)'
+      ],
+
+      _routePageChanged: function(page) {
+        this.page = page || 'data-view';
+      },
+
+      _pageChanged: function(page) {
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl(page + '.html');
+        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+
+      },
+
+      _showPage404: function() {
+        this.page = 'page-404';
+      },
+      addCard: function() {
+        var myNode = this.$.maincontent;
+        var newElement = document.createElement('data-view'); //newcard is taking setup from basedata card
+        newElement.project = this.project;
+        newElement.isNotBase = true;
+        newElement.area = this.$.basedata.area
+        newElement.measure = this.$.basedata.measure
+        newElement.grain = this.$.basedata.grain
+        newElement.pstart = this.$.basedata.pstart
+        newElement.pend = this.$.basedata.pend
+        myNode.appendChild(newElement);
+
+      }
+    });
+  </script>
+</dom-module>
