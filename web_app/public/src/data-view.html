@@ -80,28 +80,23 @@
     <div class="container"></div>
     <div  class="container"><paper-dropdown-menu label="Subject Area" id="context-top">
           <paper-listbox class="dropdown-content" selected="{{area}}" attr-for-selected="data-value">
-            <paper-item data-value="Weather">Weather</paper-item>
-            <paper-item data-value="House">House</paper-item>
-            <paper-item data-value="Garden">Garden</paper-item>
-            <paper-item data-value="Personal">Personal</paper-item>
+            <template is="dom-repeat" items="{{areaList}}">
+              <paper-item data-value="[[item]]">[[item]]</paper-item>
+            </template>
           </paper-listbox>
     </paper-dropdown-menu></div>
     <div  class="container"><paper-dropdown-menu label="Measure" id="measure-top">
           <paper-listbox class="dropdown-content" selected="{{measure}}" attr-for-selected="data-value">
-            <paper-item data-value="Temperature">Temperature</paper-item>
-            <paper-item data-value="Rain">Rain</paper-item>
-            <paper-item data-value="Wind Speed">Wind Speed</paper-item>
-            <paper-item data-value="Pressure">Pressure</paper-item>
-            <paper-item data-value="Dewpoint">Dewpoint</paper-item>
-            <paper-item data-value="Humidity">Humidity</paper-item>
+            <template is="dom-repeat" items="{{measureList}}">
+              <paper-item data-value="[[item]]">[[item]]</paper-item>
+            </template>
           </paper-listbox>
     </paper-dropdown-menu></div>
     <div  class="container"><paper-dropdown-menu label="Grain" id="grain-top">
           <paper-listbox class="dropdown-content" selected="{{grain}}" attr-for-selected="data-value" id="datagrain">
-            <paper-item data-value="Hourly">Hourly</paper-item>
-            <paper-item data-value="Daily">Daily</paper-item>
-            <paper-item data-value="Monthly">Monthly</paper-item>
-            <paper-item data-value="Yearly">Yearly</paper-item>
+            <template is="dom-repeat" items="{{grainList}}">
+              <paper-item data-value="[[item]]">[[item]]</paper-item>
+            </template>
           </paper-listbox>
     </paper-dropdown-menu></div>
     <div class="container"><paper-input id="periodstart" label="Start YYYY-MM-DD" value="{{pstart}}"></paper-input></div>
@@ -196,14 +191,55 @@
           value: false,
           notify: true
         },
+        areaList: {
+          type: Array,
+          value: ["Astronomical","Weather"]
+        },
+        measureList: {
+          type: Array,
+          value: ["Temperature","Rain","Wind Speed","Pressure","Dewpoint","Humidity"]
+        },
+        grainList: {
+          type: Array,
+          value: ["Hourly", "Daily", "Monthly", "Yearly"]
+        },
+        measureDict: {
+          type: Object,
+          value: {"Astronomical": ["Daylight"],
+                  "Weather": ["Temperature","Rain","Wind Speed","Pressure","Dewpoint","Humidity"]
+                }
+        },
+        grainDict: {
+          type: Object,
+          value: {"Astronomical": { "Daylight": ["Hourly", "Daily", "Monthly", "Yearly"]},
+                  "Weather": {"Temperature": ["Hourly", "Daily", "Monthly", "Yearly"],
+                              "Rain": ["Hourly", "Daily", "Monthly", "Yearly"],
+                              "Wind Speed": ["Hourly", "Daily", "Monthly", "Yearly"],
+                              "Pressure": ["Hourly", "Daily", "Monthly", "Yearly"],
+                              "Dewpoint": ["Hourly", "Daily", "Monthly", "Yearly"],
+                              "Humidity": ["Hourly", "Daily", "Monthly", "Yearly"]
+                             }
+                 }
+        },
       },
       observers: [
         'dataChanged(data.*)',
         'grainChanged(grain)',
-        'startEndChanged(pend,pstart)'
-        ,'dataReload(signedin)'
+        'startEndChanged(pend,pstart)',
+        'dataReload(signedin)',
+        'areaChanged(area)',
+        'measureChanged(measure)',
       ],
-
+      areaChanged: function () {
+        if (typeof this.measureDict != "undefined") {
+          this.measureList = this.measureDict[this.area];
+        }
+      },
+      measureChanged: function () {
+        if (typeof this.grainDict != "undefined") {
+          this.grainList = this.grainDict[this.area][this.measure]; 
+        }
+      },
       grainChanged: function () {
         console.log("grainChanged to: " + this.grain);
         if (this.grain == "Hourly") {
@@ -212,6 +248,8 @@
           this.$.periodstart.value = getHour(new Date(getOtherTime(endtime, -1*this.hcount, 1)));
           this.$.periodend.label = 'End YYYY-MM-DD HH';
           this.$.periodend.value = getHour(new Date(endtime));
+          console.log("periodstart: " + this.$.periodstart.value);
+          console.log("periodend: " + this.$.periodend.value);
         }
         if (this.grain == "Daily") {
           this.$.periodstart.label = 'Start YYYY-MM-DD';
@@ -252,6 +290,9 @@
         if (typeof(this.pcount) != "undefined") {
         if (this.measure == "Rain") {
           header = [["Date", "Rain"]];
+        } 
+        if (this.measure == "Daylight") {
+          header = [["Date", "Daylight"]];
         } else {
           header = [["Date", "Min", "Max", "Avg"]];
         }
@@ -266,6 +307,8 @@
           var start = getDateFromHour(this.$.periodstart.value); 
           var end = getDateFromHour(this.$.periodend.value);
           this.pcount = getCount(start, end, 1);
+          console.log("start: " + start);
+          console.log("end: " + end);
         } 
         if (this.grain == "Daily") {
           var start = getDateFromDay(this.$.periodstart.value); 

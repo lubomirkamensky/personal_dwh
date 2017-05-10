@@ -1,7 +1,9 @@
+DROP TABLE IF EXISTS pdwh_detail.event;
 CREATE TABLE pdwh_detail.event (
-  Event_Cd tinyint(4) NOT NULL,
+  Event_Type_Id int(11) NOT NULL,
+  Subject_Id int(11) NOT NULL,
   Event_Start_Dt datetime NOT NULL,
-  Event_End_Dt datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  Event_End_Dt datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   Insert_Dt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (Event_Cd,Event_Start_Dt,Event_End_Dt)
+  PRIMARY KEY (Event_Type_Id,Subject_Id,Event_Start_Dt)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

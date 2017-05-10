@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS pdwh_mart_astronomical.t_loaded_periods;
+CREATE TABLE pdwh_mart_astronomical.t_loaded_periods (
+  Hour_Id bigint(11) NOT NULL DEFAULT 2011073023
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO pdwh_mart_astronomical.t_loaded_periods VALUES(2011073023);

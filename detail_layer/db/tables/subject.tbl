@@ -1,0 +1,15 @@
+DROP TABLE IF EXISTS pdwh_detail.subject;
+CREATE TABLE pdwh_detail.subject (
+  Subject_Id int(11) NOT NULL,
+  Subject_Name varchar(250) DEFAULT NULL,
+  Subject_Area_Id int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO pdwh_detail.subject (Subject_Id, Subject_Name, Subject_Area_Id) VALUES
+(1, 'Sun', 5),
+(2, 'Moon', 5);
+
+ALTER TABLE pdwh_detail.subject
+ ADD PRIMARY KEY (Subject_Id);
+
+

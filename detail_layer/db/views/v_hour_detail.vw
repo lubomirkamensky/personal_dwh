@@ -36,63 +36,63 @@ SELECT
      ,CASE WHEN s.event_end_dt IS NOT NULL THEN s.event_start_dt ELSE NULL END AS partial_lunar_e_dt
      ,CASE WHEN t.event_end_dt IS NOT NULL THEN t.event_start_dt ELSE NULL END AS penumbral_lunar_e_dt
 FROM
-    pdwh_detail.HOUR h
+    pdwh_detail.hour h
 LEFT JOIN
-    pdwh_detail.EVENT e
+    pdwh_detail.event e
     ON h.hour_start_dt <= e.event_end_dt
       AND h.hour_end_dt >= e.event_start_dt
-      AND e.event_cd = 3
+      AND e.event_type_cd = 3
 LEFT JOIN
-    pdwh_detail.EVENT f
+    pdwh_detail.event f
     ON h.hour_start_dt <= f.event_end_dt
       AND h.hour_end_dt >= f.event_start_dt
-      AND f.event_cd = 1
+      AND f.event_type_cd = 1
 LEFT JOIN
-    pdwh_detail.EVENT i
+    pdwh_detail.event i
     ON h.hour_start_dt <= i.event_end_dt
       AND h.hour_end_dt >= i.event_start_dt
-      AND i.event_cd = 2
+      AND i.event_type_cd = 2
 LEFT JOIN
-    pdwh_detail.EVENT j
+    pdwh_detail.event j
     ON j.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND j.event_cd = 4
+      AND j.event_type_cd = 4
 LEFT JOIN
-    pdwh_detail.EVENT k
+    pdwh_detail.event k
     ON k.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND k.event_cd = 5   
+      AND k.event_type_cd = 5   
 LEFT JOIN
-    pdwh_detail.EVENT l
+    pdwh_detail.event l
     ON l.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND l.event_cd = 6
+      AND l.event_type_cd = 6
 LEFT JOIN
-    pdwh_detail.EVENT m
+    pdwh_detail.event m
     ON m.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND m.event_cd = 7
+      AND m.event_type_cd = 7
 LEFT JOIN
-    pdwh_detail.EVENT n
+    pdwh_detail.event n
     ON n.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND n.event_cd = 8   
+      AND n.event_type_cd = 8   
 LEFT JOIN
-    pdwh_detail.EVENT o
+    pdwh_detail.event o
     ON o.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND o.event_cd = 9
+      AND o.event_type_cd = 9
 LEFT JOIN
-    pdwh_detail.EVENT p
+    pdwh_detail.event p
     ON p.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND p.event_cd = 10
+      AND p.event_type_cd = 10
 LEFT JOIN
-    pdwh_detail.EVENT q
+    pdwh_detail.event q
     ON q.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND q.event_cd = 11  
+      AND q.event_type_cd = 11  
 LEFT JOIN
-    pdwh_detail.EVENT r
+    pdwh_detail.event r
     ON r.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND r.event_cd = 12
+      AND r.event_type_cd = 12
 LEFT JOIN
-    pdwh_detail.EVENT s
+    pdwh_detail.event s
     ON s.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND s.event_cd = 13
+      AND s.event_type_cd = 13
 LEFT JOIN
-    pdwh_detail.EVENT t
+    pdwh_detail.event t
     ON t.event_start_dt BETWEEN h.hour_start_dt AND h.hour_end_dt
-      AND t.event_cd = 14;
+      AND t.event_type_cd = 14;

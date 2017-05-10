@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS pdwh_detail.t_hour_detail;
 CREATE TABLE pdwh_detail.t_hour_detail (
   hour_id int(11) NOT NULL,
   prior_hour_id int(11) DEFAULT NULL,

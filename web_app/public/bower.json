@@ -43,5 +43,10 @@
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
+  },
+  "resolutions": {
+    "firebase": ">= 3.5.1 < 4.0",
+    "paper-input-wrapper": "^0.3.0",
+    "paper-input-items": "^0.4.2"
   }
 }
