@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS pdwh_detail.camera;
+CREATE TABLE pdwh_detail.camera (
+  Camera_Id int(11) NOT NULL,
+  Camera_Name varchar(250) NOT NULL,
+  PRIMARY KEY (`Camera_Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

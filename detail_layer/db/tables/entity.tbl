@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS pdwh_detail.entity;
+CREATE TABLE pdwh_detail.entity (
+  Entity_Id int(11) NOT NULL,
+  Entity_Source_Cd varchar(250) NOT NULL,
+  Source_Name varchar(250) NOT NULL,
+  Target_Table varchar(64) NOT NULL,
+  PRIMARY KEY (`Entity_Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

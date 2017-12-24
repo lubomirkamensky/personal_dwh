@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS pdwh_detail.observation_label_related;
+CREATE TABLE pdwh_detail.observation_label_related (
+  Label_Id int(11) NOT NULL,
+  Observation_Id int(11) NOT NULL,
+  PRIMARY KEY (`Label_Id`, `Observation_Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

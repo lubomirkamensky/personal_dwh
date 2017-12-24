@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS pdwh_detail.observation;
+CREATE TABLE pdwh_detail.observation (
+  Observation_Id int(11) NOT NULL,
+  Observation_Start_Dt datetime NOT NULL,
+  Sensor_Id int(11) NOT NULL,
+  Target_Table varchar(64) NOT NULL,
+  PRIMARY KEY (Sensor_Id, Observation_Start_Dt),
+  UNIQUE KEY `Observation_Id` (`Observation_Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

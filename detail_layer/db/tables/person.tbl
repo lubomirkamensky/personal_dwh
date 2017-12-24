@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS pdwh_detail.person;
+CREATE TABLE pdwh_detail.person (
+  Person_Id int(11) NOT NULL,
+  Person_Name varchar(250) NOT NULL,
+  PRIMARY KEY (`Person_Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS pdwh_detail.sensor;
+CREATE TABLE pdwh_detail.sensor (
+  Sensor_Id int(11) NOT NULL,
+  Sensor_Source_Cd varchar(250) NOT NULL,
+  Sensor_Source_Type varchar(250) DEFAULT NULL,
+  Source_Name varchar(250) NOT NULL,
+  Target_Table varchar(64) NOT NULL,
+  PRIMARY KEY (`Sensor_Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
