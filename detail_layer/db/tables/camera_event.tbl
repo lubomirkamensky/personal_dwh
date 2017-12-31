@@ -2,7 +2,6 @@ DROP TABLE IF EXISTS pdwh_detail.camera_event;
 CREATE TABLE pdwh_detail.camera_event (
   Event_Id int(11) NOT NULL,
   Event_Start_Dt datetime NOT NULL,
-  Camera_Id int(11) NOT NULL,
   Person_Id int(11) DEFAULT NULL,
   Event_Type_Id int(11) NOT NULL,
   Event_Category_Id int(11) DEFAULT NULL,

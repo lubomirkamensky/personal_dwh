@@ -4,3 +4,8 @@ CREATE TABLE pdwh_detail.observation_label (
   Label_Text varchar(250) NOT NULL,
   PRIMARY KEY (`Label_Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO pdwh_detail.observation_label (Label_Id, Label_Text) VALUES
+(1, 'Human'),
+(2, 'Vehicle'),
+(3, 'Animal')

@@ -2,6 +2,6 @@ DROP TABLE IF EXISTS pdwh_detail.camera_snapshot;
 CREATE TABLE pdwh_detail.camera_snapshot (
   Snapshot_Id int(11) NOT NULL,
   File_Name varchar(250) NOT NULL,
-  Event_Id int(11) NOT NULL,
+  File_ID varchar(250) NOT NULL,
   PRIMARY KEY (`Snapshot_Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

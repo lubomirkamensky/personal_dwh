@@ -2,7 +2,8 @@ DROP TABLE IF EXISTS pdwh_detail.event_type;
 CREATE TABLE pdwh_detail.event_type (
   Event_Type_Id int(11) NOT NULL,
   Event_Type_Cd varchar(25) DEFAULT NULL,
-  Event_Type_Name varchar(250) DEFAULT NULL
+  Event_Type_Name varchar(250) DEFAULT NULL,
+  PRIMARY KEY (Event_Type_Id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO pdwh_detail.event_type (Event_Type_Id, Event_Type_Cd, Event_Type_Name) VALUES
@@ -15,9 +16,11 @@ INSERT INTO pdwh_detail.event_type (Event_Type_Id, Event_Type_Cd, Event_Type_Nam
 (7, 'NM', 'New Moon'),
 (8, 'FQ', 'First Quarter'),
 (9, 'FM', 'Full Moon'),
-(10, 'LQ', 'Last Quarter');
+(10, 'LQ', 'Last Quarter'),
+(11, 'PRS', 'Person'),
+(12, 'MVT', 'Movement'),
+(13, 'ODR', 'Outdoor'),
+;
 
-ALTER TABLE pdwh_detail.event_type
- ADD PRIMARY KEY (Event_Type_Id);
 
 
