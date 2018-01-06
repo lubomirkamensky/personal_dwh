@@ -19,7 +19,7 @@ INSERT INTO pdwh_detail.event_type (Event_Type_Id, Event_Type_Cd, Event_Type_Nam
 (10, 'LQ', 'Last Quarter'),
 (11, 'PRS', 'Person'),
 (12, 'MVT', 'Movement'),
-(13, 'ODR', 'Outdoor'),
+(13, 'ODR', 'Outdoor')
 ;
 
 
