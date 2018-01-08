@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from sys import exit
+import sys
 from multiprocessing import Pool
 import lnetatmo
 import datetime
@@ -36,11 +37,10 @@ def cameraLoop(name):
     while (time.time() < ts + 55):
         start = time.time()
         writeSnapshot(name)
-        if time.time() - start < 5:
-            time.sleep(5-(time.time() - start))
+        if time.time() - start < 8:
+            time.sleep(8-(time.time() - start))
 
-pool = Pool(processes=3)
-pool.map(cameraLoop, ["Prizemi","VCHOD","Zahrada"]) 
+cameraLoop(sys.argv[1])
 
 exit(0)   
 
