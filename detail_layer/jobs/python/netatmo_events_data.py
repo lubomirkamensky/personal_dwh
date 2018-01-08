@@ -14,7 +14,7 @@ def xstr(s):
 
 import json
 config = json.loads(open('config/netatmo.json').read())
-myconfig = json.loads(open('config/mysql.json').read())
+myconfig = json.loads(open('config/local_mysql.json').read())
 
 #Server Connection to MySQL:
 import MySQLdb
@@ -145,10 +145,10 @@ cur.execute("SELECT COALESCE(MAX(Observation_Id),0) \
 row = cur.fetchone()
 lastId = row[0]
 
-cur.execute("SELECT COALESCE(MAX(Observation_Id),0) \
-             FROM pdwh_detail.observation")
+cur.execute("SELECT COALESCE(MAX(Observation_label_related_Id),0) \
+             FROM pdwh_detail.observation_label_related")
 row = cur.fetchone()
-lastId = row[0]
+lastId2 = row[0]
 
 tmp = open('./tmp.txt','w')
 tmp2 = open('./tmp2.txt','w')
@@ -182,7 +182,8 @@ for i in homeData.events.keys():
 
         if x[1] == 'outdoor': 
             for y in x[2]:
-                tmp3.write(xstr(lastId)  + '\t' + xstr(label[y]) + '\n')
+                lastId2 = lastId2 + 1
+                tmp3.write(xstr(lastId2)  + '\t' + xstr(lastId)  + '\t' + xstr(label[y]) + '\n')
     
 tmp.close()
 tmp2.close()
