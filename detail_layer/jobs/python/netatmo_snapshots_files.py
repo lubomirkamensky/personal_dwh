@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from sys import exit
+from multiprocessing import Pool
 import lnetatmo
 import datetime
 import time
@@ -30,10 +31,16 @@ def writeSnapshot(MY_CAMERA):
     except:
         pass  
 
-writeSnapshot("Prizemi")
-writeSnapshot("VCHOD")
-writeSnapshot("Zahrada")
+# we will execute this cript each minute
+def cameraLoop(name):
+    while (time.time() < ts + 55):
+        start = time.time()
+        writeSnapshot(name)
+        if time.time() - start < 5:
+            time.sleep(5-(time.time() - start))
 
+pool = Pool(processes=3)
+pool.map(cameraLoop, ["Prizemi","VCHOD","Zahrada"]) 
 
 exit(0)   
 
