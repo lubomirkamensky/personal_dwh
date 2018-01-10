@@ -9,12 +9,15 @@ import datetime
 import time
 ts = time.time()
 
+log = open("log_events.txt", "w")
+
 def xstr(s):
     return '' if s is None else str(s)
 
+# Db connection setup for both local and cloud mysql
 import json
 config = json.loads(open('config/netatmo.json').read())
-myconfig = json.loads(open('config/local_mysql.json').read())
+myconfig = json.loads(open('config/mysql.json').read())
 
 #Server Connection to MySQL:
 import MySQLdb
@@ -27,28 +30,35 @@ authorization = lnetatmo.ClientAuth(**config)
 # Gather Home information (available cameras and other infos)
 homeData = lnetatmo.HomeData(authorization)
 
+# define one record in batch file loading the super table.
+# this method is overwritten for each particular table
 def getRowString(value):
-	stringOneRow = value['id'] + '\t' + value['type'] + '\tapi.netatmo.com\tcamera' + '\n'
-	return stringOneRow
+    stringOneRow = value['id'] + '\t' + value['type'] + '\tapi.netatmo.com\tcamera' + '\n'
+    return stringOneRow
 
+# common pattern for loading super type table
 def loadSuperTable(targetTable,sqlGetloadedItems,allItems,sqlGetlastId):
     try:
         loadedItems = []
-        tmp = open('./tmp.txt','w')
+        # batch file, fix for windows line end works for python 3.x
+        tmp = open('./tmp.txt','w', newline='\n')
         lastId = 0
         
+        # extracts source keys for data loaded earlier
         cur.execute(sqlGetloadedItems)
         rows = cur.fetchall()
         for row in rows:
             loadedItems.append(row[0]) 
        
+        # excludes data loaded earlier
         newItems = { key:value for key, value in allItems.items() if key not in loadedItems } 
-        #print( newItems)
 
+        # gets MAX surrogate key from loaded data
         cur.execute(sqlGetlastId)
         row = cur.fetchone()
         lastId = row[0]
 
+        # generates the batch file for the new load
         for value in newItems.values():
             lastId = lastId + 1
             tmp.write('' + xstr(lastId) + '\t' + getRowString(value)) 
@@ -59,23 +69,23 @@ def loadSuperTable(targetTable,sqlGetloadedItems,allItems,sqlGetlastId):
         con.commit()
 
     except Exception:
-        s = traceback.format_exc()
-        serr = "there were errors:\n%s\n" % (s)
-        sys.stderr.write(serr)         
+        traceback.print_exc(file=log)
+        log.close()       
 
+# common pattern for loading sub type table, similar as above but simplified  
 def loadSubTable(targetTable,allItems,nameKey,sqlGetSubTableItems):
-	names = { value['id']: value[nameKey] for key, value in allItems.items()  } 
+    names = { value['id']: value[nameKey] for key, value in allItems.items()  } 
+    tmp = open('./tmp.txt','w', newline='\n')
+
+    cur.execute(sqlGetSubTableItems)
+    rows = cur.fetchall()
+    for row in rows:
+        tmp.write('' + xstr(row[1]) + '\t' + names[row[0]] + '\n')
     
-	tmp = open('./tmp.txt','w')
-	cur.execute(sqlGetSubTableItems)
-	rows = cur.fetchall()
-	for row in rows:
-		tmp.write('' + xstr(row[1]) + '\t' + names[row[0]] + '\n')
+    tmp.close()
     
-	tmp.close()
-        
-	cur.execute("LOAD DATA LOCAL INFILE './tmp.txt' IGNORE INTO TABLE pdwh_detail." + targetTable + ";")  
-	con.commit()
+    cur.execute("LOAD DATA LOCAL INFILE './tmp.txt' IGNORE INTO TABLE pdwh_detail." + targetTable + ";")  
+    con.commit()
 
 # Sensor > Camera
 sqlGetloadedItems = "SELECT Sensor_Source_Cd \
@@ -98,6 +108,8 @@ sqlGetloadedItems = "SELECT Entity_Source_Cd \
 allItems = { key:value for key, value in homeData.persons.items() if 'pseudo' in value.keys() }
 sqlGetlastId = "SELECT COALESCE(MAX(Entity_Id),0) \
                 FROM pdwh_detail.entity;"
+
+# overwritting the method
 def getRowString(value):
 	stringOneRow = value['id'] + '\tapi.netatmo.com\tperson' + '\n'
 	return stringOneRow
@@ -111,6 +123,7 @@ loadSubTable('person',allItems,'pseudo',sqlGetSubTableItems)
 
 # Observation > Event > Label
 
+# make dictionaries representing all needed master data tables
 event_type = {'person':11,'movement':12,'outdoor':13}
 
 label = {'human':1,'vehicle':2,'animal':3}
@@ -129,17 +142,22 @@ cur.execute("SELECT Sensor_Id,Sensor_Source_Cd \
              WHERE Target_Table = 'camera' AND Source_Name = 'api.netatmo.com';")
 rows = cur.fetchall()
 for row in rows:
+    # Camera Source Cd: (Camera Surrogate Key, MAX timestamp)
     camera[row[1]] = [row[0],0]
 
+# gets MAX timestamp for each camera from already loaded data
 cur.execute("SELECT s.Sensor_Source_Cd,COALESCE(MAX(o.Observation_Timestamp),0) \
              FROM  pdwh_detail.observation o \
              INNER JOIN pdwh_detail.sensor s ON o.Sensor_Id = s.Sensor_Id \
              WHERE s.Target_Table = 'camera' AND s.Source_Name = 'api.netatmo.com' \
              GROUP BY 1")
 rows = cur.fetchall()
+
+# stores the values in camera dictionary
 for row in rows:
     camera[row[0]][1] = row[1]
 
+# gets MAX surrogate keys from loaded data
 cur.execute("SELECT COALESCE(MAX(Observation_Id),0) \
              FROM pdwh_detail.observation")
 row = cur.fetchone()
@@ -150,41 +168,45 @@ cur.execute("SELECT COALESCE(MAX(Observation_label_related_Id),0) \
 row = cur.fetchone()
 lastId2 = row[0]
 
-tmp = open('./tmp.txt','w')
-tmp2 = open('./tmp2.txt','w')
-tmp3 = open('./tmp3.txt','w')
-tmp4 = open('./tmp4.txt','w')
+tmp = open('./tmp.txt','w', newline='\n')
+tmp2 = open('./tmp2.txt','w', newline='\n')
+tmp3 = open('./tmp3.txt','w', newline='\n')
+tmp4 = open('./tmp4.txt','w', newline='\n')
 
-for i in homeData.events.keys():
-    xEvents = homeData.events[i]
+try:
 
-    p1 = [ [value['time'],value['type'],value['person_id']] if 'person_id' in value.keys() 
-            else [value['time'],value['type'],set([i['type'] for i in value['event_list']])] 
-            if 'event_list' in value.keys() else [value['time'],value['type']] 
-            for key, value in xEvents.items() if key > camera[i][1] ]
-    
-    
+    for i in homeData.events.keys():
+        xEvents = homeData.events[i]
 
-    for x in p1:
-        lastId = lastId + 1
-        tmp.write(xstr(lastId)  + '\t' + xstr(x[0]) + '\t' + xstr(camera[i][0]) + '\t' +  \
-                  'camera_event' + '\n')
+        p1 = [ [value['time'],value['type'],value['person_id']] if 'person_id' in value.keys() 
+                else [value['time'],value['type'],set([i['type'] for i in value['event_list']])] 
+                if 'event_list' in value.keys() else [value['time'],value['type']] 
+                for key, value in xEvents.items() if key > camera[i][1] ]
 
-        if x[1] == 'person': 
-            tmp4.write(xstr(lastId)  + '\t' + \
-                       datetime.datetime.fromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S') + '\t' + \
-                       xstr(person[x[2]]) + '\t' + \
-                       xstr(event_type[x[1]]) + '\n')
-        else:
-            tmp2.write(xstr(lastId)  + '\t' + \
-                       datetime.datetime.fromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S') + '\t' + \
-                       xstr(event_type[x[1]]) + '\n')
+        for x in p1:
+            lastId = lastId + 1
+            tmp.write(xstr(lastId)  + '\t' + xstr(x[0]) + '\t' + xstr(camera[i][0]) + '\t' +  \
+                      'camera_event' + '\n')
 
-        if x[1] == 'outdoor': 
-            for y in x[2]:
-                lastId2 = lastId2 + 1
-                tmp3.write(xstr(lastId2)  + '\t' + xstr(lastId)  + '\t' + xstr(label[y]) + '\n')
-    
+            if x[1] == 'person': 
+                tmp4.write(xstr(lastId)  + '\t' + \
+                           datetime.datetime.fromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S') + '\t' + \
+                           xstr(person[x[2]]) + '\t' + \
+                           xstr(event_type[x[1]]) + '\n')
+            else:
+                tmp2.write(xstr(lastId)  + '\t' + \
+                           datetime.datetime.fromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S') + '\t' + \
+                           xstr(event_type[x[1]]) + '\n')
+
+            if x[1] == 'outdoor': 
+                for y in x[2]:
+                    lastId2 = lastId2 + 1
+                    tmp3.write(xstr(lastId2)  + '\t' + xstr(lastId)  + '\t' + xstr(label[y]) + '\n')
+ 
+except Exception:
+    traceback.print_exc(file=log)
+    log.close()       
+   
 tmp.close()
 tmp2.close()
 tmp3.close()

@@ -6,15 +6,24 @@ from multiprocessing import Pool
 import lnetatmo
 import datetime
 import time
+import traceback
+import json
 ts = time.time()
 
-import json
+#This line opens a log file
+log = open("log_" + sys.argv[1] + ".txt", "w")
+
 config = json.loads(open('config/netatmo.json').read())
 # Netatmo Authenticate (see authentication in documentation)
 authorization = lnetatmo.ClientAuth(**config)
 
 # Gather Home information (available cameras and other infos)
-homeData = lnetatmo.HomeData(authorization)
+try:
+    homeData = lnetatmo.HomeData(authorization)
+except Exception:
+    traceback.print_exc(file=log)
+    log.close()  
+
 
 def writeSnapshot(MY_CAMERA):
     try:
@@ -29,16 +38,17 @@ def writeSnapshot(MY_CAMERA):
         # Save the snapshot in a file
         snapshotPath = "./snapshots/" + MY_CAMERA + "/" + str(round(time.time())) + ".jpg"
         with open(snapshotPath, "wb") as f: f.write(snapshot)
-    except:
-        pass  
+    except Exception:
+        traceback.print_exc(file=log)
+        log.close()  
 
 # we will execute this cript each minute
 def cameraLoop(name):
-    while (time.time() < ts + 55):
+    while (time.time() < ts + 86395):
         start = time.time()
         writeSnapshot(name)
-        if time.time() - start < 8:
-            time.sleep(8-(time.time() - start))
+        if time.time() - start < 6:
+            time.sleep(6-(time.time() - start))
 
 cameraLoop(sys.argv[1])
 

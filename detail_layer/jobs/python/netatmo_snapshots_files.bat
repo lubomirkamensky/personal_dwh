@@ -1,0 +1,1 @@
+python C:\personaldwh\netatmo_snapshots_files.py %1

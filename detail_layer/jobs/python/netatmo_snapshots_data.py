@@ -10,7 +10,7 @@ def xstr(s):
     return '' if s is None else str(s)
 
 import json
-myconfig = json.loads(open('config/local_mysql.json').read())
+myconfig = json.loads(open('config/mysql.json').read())
 
 #Server Connection to MySQL:
 import MySQLdb
@@ -48,26 +48,32 @@ sqlGetNewCameraEvents = "SELECT \
 # event type 13 outdoor --  15 sec range
 # 11,12  person,movement --  5 sec range
 
-tmp = open('./tmp_s.txt','w')
+tmp = open('./tmp_s.txt','w', newline='\n')
 cur.execute(sqlGetNewCameraEvents)
 rows = cur.fetchall()
 for row in rows:
     if row[2] == 13:
-        r = range(row[1],row[1] + 15)
+        r = range(row[1],row[1] + 40)
+        n = 3
     else:
-        r = range(row[1],row[1] + 5)
+        r = range(row[1],row[1] + 20)
+        n = 1
     
     indir = './snapshots/' + row[4]
     for root, dirs, filenames in os.walk(indir):
+        filenames = sorted([ int(f.split('.')[0]) for f in filenames if f != 'Thumbs.db' ])
+        filenames = list(set(filenames) & set(r))
+        cnt = 1
         for f in filenames:
-            if int(f.split('.')[0]) in r:
+            if cnt <= n:
                 lastId = lastId + 1
-
+                cnt = cnt + 1
                 # Observation_Id,Observation_Timestamp,Sensor_Id,Related_Observation_Id,Target_Table
-                tmp.write(xstr(lastId)  + '\t' + f.split('.')[0]  + '\t' + xstr(row[3])  + '\t' + \
+                tmp.write(xstr(lastId)  + '\t' + xstr(f)  + '\t' + xstr(row[3])  + '\t' + \
                           xstr(row[0]) + '\t' + 'camera_snapshot' + '\n')
                 
-                os.rename('./snapshots/' + row[4] + '/' + f, './snapshots/_tmp/' + xstr(lastId) + '.jpg')
+                os.rename('./snapshots/' + row[4] + '/' + xstr(f) + '.jpg', './snapshots/Google_Gate/camera_snapshot_' \
+                          + xstr(lastId) + '.jpg')
 
 tmp.close()
 cur.execute("LOAD DATA LOCAL INFILE './tmp_s.txt' \
@@ -77,5 +83,15 @@ con.commit()
 if con:    
     con.close()
 
-exit(0)   
 
+for d in ["Prizemi","VCHOD","Zahrada"]:
+    indir = './snapshots/' + d
+    for root, dirs, filenames in os.walk(indir):
+        filenames = [ int(f.split('.')[0]) for f in filenames \
+                      if f != 'Thumbs.db' and int(f.split('.')[0]) < round(time.time()) - 3600 ]
+        for f in filenames:
+            os.remove(indir + '/' + xstr(f)+ '.jpg') 
+        
+
+
+exit(0)   
