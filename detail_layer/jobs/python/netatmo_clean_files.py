@@ -17,6 +17,7 @@ import MySQLdb
 con = MySQLdb.connect(**myconfig)
 cur = con.cursor()
 
+# to get list of snapshot photos booked in database
 sqlGetSnapshotFiles = "SELECT File_Name \
                        FROM pdwh_detail.camera_snapshot \
                        ORDER BY Snapshot_Id desc LIMIT 500;"
@@ -30,14 +31,17 @@ for row in rows:
 if con:    
     con.close()
 
+# to get list of snapshot photos in folder monitored by Google sync tool
 dirSnapshotFiles = []
 indir = './snapshots/Google_Gate' 
 for root, dirs, filenames in os.walk(indir):
     for f in filenames:
         dirSnapshotFiles.append(f) 
 
+# intersection of snapshot photos in database and snapshot photos in folder monitored by Google sync tool
 filenames = list(set(dbSnapshotFiles) & set(dirSnapshotFiles))
 
+# removes snapshot photos already stored in Google Drive & Photos
 for f in filenames:
     os.remove(indir + '/' + f) 
 

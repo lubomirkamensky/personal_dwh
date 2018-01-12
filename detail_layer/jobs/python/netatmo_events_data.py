@@ -213,43 +213,52 @@ try:
                 if 'person_id' in value.keys() 
                 else [value['time'],
                       value['type'],
+                      # using set to get distinct event types from the whole event list
                       set([i['type'] for i in value['event_list']]),
                       [[i['time'],i['snapshot']] if 'snapshot' in i.keys() else [] for i in value['event_list'] ]] 
                 if 'event_list' in value.keys() 
                 else [value['time'],
                       value['type']] 
-                for key, value in xEvents.items()  ]
+                for key, value in xEvents.items() if key > camera[i][1]  ]
 
 # Loops selected data fragments to generate SQL to be loaded and snapshot photos to be stored
 
         for x in p1:
             lastId = lastId + 1
+            # prepare load for observation table
             tmp.write(xstr(lastId)  + '\t' + xstr(x[0]) + '\t' + xstr(camera[i][0]) + '\t' +  \
                       'camera_event' + '\n')
 
             if x[1] == 'person': 
+                # prepare load for event table
                 tmp4.write(xstr(lastId)  + '\t' + \
                            datetime.datetime.fromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S') + '\t' + \
                            xstr(person[x[2]]) + '\t' + \
                            xstr(event_type[x[1]]) + '\n')
                 
+                # stores snapshot photos from netatmo api
                 if x[1] == 'person' and len(x) == 4:
                     for y in x[3]:
                         saveFromUrl(i,camera,y)
+            
+            # prepare load for event table
             else:
                 tmp2.write(xstr(lastId)  + '\t' + \
                            datetime.datetime.fromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S') + '\t' + \
                            xstr(event_type[x[1]]) + '\n')
                 
+                # stores snapshot photos from netatmo api
                 if x[1] == 'movement' and len(x) == 3:
                     for y in x[2]:
                         saveFromUrl(i,camera,y)
 
+            # load event labels
             if x[1] == 'outdoor': 
                 for y in x[2]:
                     lastId2 = lastId2 + 1
                     tmp3.write(xstr(lastId2)  + '\t' + xstr(lastId)  + '\t' + xstr(label[y]) + '\n')
 
+                # stores snapshot photos from netatmo api
                 if x[1] == 'outdoor' and len(x) == 4:
                     for y in x[3]:
                         saveFromUrl(i,camera,y)
