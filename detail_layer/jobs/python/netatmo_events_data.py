@@ -4,6 +4,7 @@ import traceback
 import sys
 import os
 from sys import exit
+from urllib import request
 import lnetatmo
 import datetime
 import time
@@ -111,8 +112,8 @@ sqlGetlastId = "SELECT COALESCE(MAX(Entity_Id),0) \
 
 # overwritting the method
 def getRowString(value):
-	stringOneRow = value['id'] + '\tapi.netatmo.com\tperson' + '\n'
-	return stringOneRow
+    stringOneRow = value['id'] + '\tapi.netatmo.com\tperson' + '\n'
+    return stringOneRow
 loadSuperTable("entity",sqlGetloadedItems,allItems,sqlGetlastId)
 
 sqlGetSubTableItems = "SELECT Entity_Source_Cd,Entity_Id \
@@ -137,13 +138,14 @@ for row in rows:
     person[row[1]] = row[0]
 
 camera = {}
-cur.execute("SELECT Sensor_Id,Sensor_Source_Cd \
-             FROM pdwh_detail.sensor \
-             WHERE Target_Table = 'camera' AND Source_Name = 'api.netatmo.com';")
+cur.execute("SELECT s.Sensor_Id,s.Sensor_Source_Cd,p.Camera_Name \
+             FROM pdwh_detail.sensor s \
+             INNER JOIN pdwh_detail.camera p ON s.Sensor_Id = p.Camera_Id \
+             WHERE s.Target_Table = 'camera' AND s.Source_Name = 'api.netatmo.com';")
 rows = cur.fetchall()
 for row in rows:
-    # Camera Source Cd: (Camera Surrogate Key, MAX timestamp)
-    camera[row[1]] = [row[0],0]
+    # Camera Source Cd: (Camera Surrogate Key, MAX timestamp, Camera Name)
+    camera[row[1]] = [row[0],0,row[2]]
 
 # gets MAX timestamp for each camera from already loaded data
 cur.execute("SELECT s.Sensor_Source_Cd,COALESCE(MAX(o.Observation_Timestamp),0) \
@@ -173,15 +175,52 @@ tmp2 = open('./tmp2.txt','w', newline='\n')
 tmp3 = open('./tmp3.txt','w', newline='\n')
 tmp4 = open('./tmp4.txt','w', newline='\n')
 
+# stores snapshot photos from netatmo api urls
+def saveFromUrl(cameraKey,cameraDict,snapshoDict):
+    if 'id' in snapshoDict[1].keys():
+        url = "https://api.netatmo.com/api/getcamerapicture?image_id=" \
+        + snapshoDict[1]['id'] + "&key=" + snapshoDict[1]['key']
+    elif 'filename' in snapshoDict[1].keys():
+        url = homeData.cameraUrls(cid=cameraKey)[0] + '/' + snapshoDict[1]['filename']
+    else:
+        url = ""
+
+    snapshotPath = "./snapshots/" + xstr(cameraDict[cameraKey][2]) + "/" + xstr(snapshoDict[0]) + ".jpg"
+    f = open(snapshotPath, 'wb')
+    f.write(request.urlopen(url).read())
+    f.close()
+
+# Loops all new events in netatmo api and pick useful data
+
 try:
 
     for i in homeData.events.keys():
         xEvents = homeData.events[i]
 
-        p1 = [ [value['time'],value['type'],value['person_id']] if 'person_id' in value.keys() 
-                else [value['time'],value['type'],set([i['type'] for i in value['event_list']])] 
-                if 'event_list' in value.keys() else [value['time'],value['type']] 
-                for key, value in xEvents.items() if key > camera[i][1] ]
+        p1 = [ [  value['time'],
+                  value['type'],
+                  value['person_id'],
+                  [value['time'],value['snapshot']] ]
+                if 'snapshot' in value.keys() and 'person_id' in value.keys() 
+                else [
+                      value['time'],
+                      value['type'],
+                      [value['time'],value['snapshot']]]
+                if 'snapshot' in value.keys()
+                else [value['time'],
+                      value['type'],
+                      value['person_id']] 
+                if 'person_id' in value.keys() 
+                else [value['time'],
+                      value['type'],
+                      set([i['type'] for i in value['event_list']]),
+                      [[i['time'],i['snapshot']] if 'snapshot' in i.keys() else [] for i in value['event_list'] ]] 
+                if 'event_list' in value.keys() 
+                else [value['time'],
+                      value['type']] 
+                for key, value in xEvents.items()  ]
+
+# Loops selected data fragments to generate SQL to be loaded and snapshot photos to be stored
 
         for x in p1:
             lastId = lastId + 1
@@ -193,15 +232,27 @@ try:
                            datetime.datetime.fromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S') + '\t' + \
                            xstr(person[x[2]]) + '\t' + \
                            xstr(event_type[x[1]]) + '\n')
+                
+                if x[1] == 'person' and len(x) == 4:
+                    for y in x[3]:
+                        saveFromUrl(i,camera,y)
             else:
                 tmp2.write(xstr(lastId)  + '\t' + \
                            datetime.datetime.fromtimestamp(x[0]).strftime('%Y-%m-%d %H:%M:%S') + '\t' + \
                            xstr(event_type[x[1]]) + '\n')
+                
+                if x[1] == 'movement' and len(x) == 3:
+                    for y in x[2]:
+                        saveFromUrl(i,camera,y)
 
             if x[1] == 'outdoor': 
                 for y in x[2]:
                     lastId2 = lastId2 + 1
                     tmp3.write(xstr(lastId2)  + '\t' + xstr(lastId)  + '\t' + xstr(label[y]) + '\n')
+
+                if x[1] == 'outdoor' and len(x) == 4:
+                    for y in x[3]:
+                        saveFromUrl(i,camera,y)
  
 except Exception:
     traceback.print_exc(file=log)
