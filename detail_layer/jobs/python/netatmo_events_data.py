@@ -194,9 +194,12 @@ def saveFromUrl(cameraKey,cameraDict,snapshoDict):
 
 try:
 
+    # first we get list of cameras, each camera represented by camera netatmo ID
     for i in homeData.events.keys():
+        # here we get list of events for one particular camera
         xEvents = homeData.events[i]
 
+        # List Comprehension in practis
         p1 = [ [  value['time'],
                   value['type'],
                   value['person_id'],
@@ -215,7 +218,8 @@ try:
                       value['type'],
                       # using set to get distinct event types from the whole event list
                       set([i['type'] for i in value['event_list']]),
-                      [[i['time'],i['snapshot']] if 'snapshot' in i.keys() else [] for i in value['event_list'] ]] 
+                      [[i['time'],i['snapshot']] if 'snapshot' in i.keys() 
+                                                 else [] for i in value['event_list'] ]] 
                 if 'event_list' in value.keys() 
                 else [value['time'],
                       value['type']] 
