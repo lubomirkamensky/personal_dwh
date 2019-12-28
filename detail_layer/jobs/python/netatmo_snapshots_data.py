@@ -22,6 +22,7 @@ cur.execute("SELECT COALESCE(MAX(Observation_Id),0) \
 row = cur.fetchone()
 lastId = row[0]
 
+# to get events without related snapshot photos
 sqlGetNewCameraEvents = "SELECT \
                            o.Observation_Id, \
                            o.Observation_timestamp, \
@@ -44,7 +45,18 @@ sqlGetNewCameraEvents = "SELECT \
                            ON o.Observation_Id = s.Related_Observation_Id \
                              AND s.Target_Table = 'camera_snapshot' \
                        WHERE \
-                           s.Related_Observation_Id IS NULL" # to get events without related snapshot photos
+                           p.Camera_Name <> 'Prizemi' \
+                           AND o.Observation_timestamp > (UNIX_TIMESTAMP()-86400) \
+                           AND o.Observation_Id NOT IN (\
+                                                    SELECT \
+                                                        Related_Observation_Id \
+                                                    FROM \
+                                                        pdwh_detail.observation \
+                                                    WHERE \
+                                                        Target_Table = 'camera_snapshot' \
+                                                    GROUP BY 1 \
+                                                   )" 
+
 # event type 13 outdoor --  15 sec range
 # 11,12  person,movement --  5 sec range
 
@@ -91,12 +103,12 @@ con.commit()
 if con:    
     con.close()
 
-# removes snapshot photos older than one hour from camera folders
-for d in ["Prizemi","VCHOD","Zahrada"]:
+# removes snapshot photos older than two hours from camera folders
+for d in ["Prizemi","VCHOD","Zahrada","Garaz","StudnaSZ","StudnaJV"]:
     indir = './snapshots/' + d
     for root, dirs, filenames in os.walk(indir):
         filenames = [ int(f.split('.')[0]) for f in filenames \
-                      if f != 'Thumbs.db' and int(f.split('.')[0]) < round(time.time()) - 3600 ]
+                      if f != 'Thumbs.db' and int(f.split('.')[0]) < round(time.time()) - 7200 ]
         for f in filenames:
             os.remove(indir + '/' + xstr(f)+ '.jpg') 
         
